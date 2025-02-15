@@ -1,6 +1,7 @@
 # MNIST Neural Network from Scratch
 
 This repository contains a Jupyter notebook that demonstrates how to implement a simple two-layer neural network from scratch and train it on the MNIST digit recognizer dataset. The goal of this workshop is to provide an instructional example through which you can understand the basic concepts of neural networks, including forward and backward propagation, parameter initialization, and gradient descent.
+Godspeed Randomize();
 
 ## Repository Contents
 
@@ -68,4 +69,82 @@ def forward_prop(W1, b1, W2, b2, X):
     return Z1, A1, Z2, A2
 
 def backward_prop(Z1, A1, Z2, A2, W1, W2, X, Y):
- ▋
+    one_hot_Y = one_hot(Y)
+    dZ2 = A2 - one_hot_Y
+    dW2 = 1 / m * dZ2.dot(A1.T)
+    db2 = 1 / m * np.sum(dZ2, axis=1, keepdims=True)
+    dZ1 = W2.T.dot(dZ2) * ReLU_deriv(Z1)
+    dW1 = 1 / m * dZ1.dot(X.T)
+    db1 = 1 / m * np.sum(dZ1, axis=1, keepdims=True)
+    return dW1, db1, dW2, db2
+
+def update_params(W1, b1, W2, b2, dW1, db1, dW2, db2, alpha):
+    W1 = W1 - alpha * dW1
+    b1 = b1 - alpha * db1    
+    W2 = W2 - alpha * dW2  
+    b2 = b2 - alpha * db2    
+    return W1, b1, W2, b2
+```
+
+### 4. Training the Neural Network
+
+We train the neural network using gradient descent and print the accuracy at regular intervals.
+
+```python
+def gradient_descent(X, Y, alpha, iterations):
+    W1, b1, W2, b2 = init_params()
+    for i in range(iterations):
+        Z1, A1, Z2, A2 = forward_prop(W1, b1, W2, b2, X)
+        dW1, db1, dW2, db2 = backward_prop(Z1, A1, Z2, A2, W1, W2, X, Y)
+        W1, b1, W2, b2 = update_params(W1, b1, W2, b2, dW1, db1, dW2, db2, alpha)
+        if i % 10 == 0:
+            print("Iteration: ", i)
+            predictions = get_predictions(A2)
+            print(get_accuracy(predictions, Y))
+    return W1, b1, W2, b2
+
+W1, b1, W2, b2 = gradient_descent(X_train, Y_train, 0.12, 500)
+```
+
+### 5. Testing the Neural Network
+
+We test the neural network on the development set and print the accuracy.
+
+```python
+def make_predictions(X, W1, b1, W2, b2):
+    _, _, _, A2 = forward_prop(W1, b1, W2, b2, X)
+    predictions = get_predictions(A2)
+    return predictions
+
+dev_predictions = make_predictions(X_dev, W1, b1, W2, b2)
+print("Accuracy on dev set:", get_accuracy(dev_predictions, Y_dev))
+```
+
+## Results
+
+The neural network achieves approximately 85% accuracy on the training set and 85.2% accuracy on the development set.
+
+## Dependencies
+
+- numpy
+- pandas
+- matplotlib
+- scikit-learn
+
+To install the required dependencies, run the following command:
+
+```bash
+pip install numpy pandas matplotlib scikit-learn
+```
+
+## Usage
+
+To run the notebook, open it in Jupyter and execute the cells in order. The notebook will guide you through the process of training and testing the neural network on the MNIST dataset.
+
+## Conclusion
+
+This workshop demonstrated how to build a simple neural network from scratch and train it on the MNIST dataset. By understanding the implementation details, you can gain a deeper understanding of how neural networks work and apply these concepts to more complex problems.
+
+Feel free to experiment with different network architectures, hyperparameters, and datasets to further enhance your understanding of neural networks.
+
+Happy learning!
